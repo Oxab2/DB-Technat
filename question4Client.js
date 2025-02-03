@@ -1,27 +1,27 @@
 
-// Script repondant a la question "Qui est le commercial pour le client XXXX"
+// Script repondant a la question "Qui est la coordinatrice pour le client XXXX"
 
 
 const { MongoClient } = require("mongodb");
 
 // Info connexion
-const uri = process.env.DB_URI;
+const uri = "mongodb://ia-oxab:m8QmKHpKAwMJQuU47TYG@192.168.1.29:27017/?authSource=da";
 const client = new MongoClient(uri);
 
-let commercialList = []
+let chargeProjetLeadList = []
 
-async function getCommercialByClient(search) {
+async function getchargeProjetLeadByClient(search) {
     try {
         await client.connect();  
         console.log("Connecter ");
 
-        const db = client.db(process.env.DB_NAME)
+        const db = client.db("da");  // da et da-re7
 
         const pipeline = [
             {
                 $lookup: {
                     from: "clients", //Collection a joindre 
-                    localField: "clientId", //clé a dossier_affaire
+                    localField: "clientId", //clé  dossier_affaire
                     foreignField: "_id", //clé client
                     as: "clientInfo" 
                 }
@@ -36,28 +36,28 @@ async function getCommercialByClient(search) {
                 $project: { 
                     _id: 0,
                     client: "$clientInfo.nom",
-                    commercial: 1,
+                    chargeProjetLead: 1,
                     nomAffaire: 1
                 }
             }
         ];
 
-        const results = await db.collection("dossier_affaires").aggregate(pipeline).toArray();
+        const documents = await db.collection("dossier_affaires").aggregate(pipeline).toArray();
 
 
 
-        if (results.length === 0){
+        if (documents.length === 0){
             console.log("Pas de resultat")
             return;
         }
 
-        results.forEach(result => {
-            if (!commercialList.includes(result.commercial) && result.commercial !== ""){
-                commercialList.push(result.commercial)
+        documents.forEach(result => {
+            if (!chargeProjetLeadList.includes(result.chargeProjetLead) && result.chargeProjetLead !== ""){
+                chargeProjetLeadList.push(result.chargeProjetLead)
             }
         });
 
-        console.log(`Le client ${search} a comme commerciale ${commercialList}.`);
+        console.log(`Le client ${search} a comme chargeProjetLead ${chargeProjetLeadList}.`);
 
 
     } catch (error) {
@@ -68,5 +68,5 @@ async function getCommercialByClient(search) {
     }
 }
 
-getCommercialByClient("LPG SYSTEMS");
+getchargeProjetLeadByClient("LPG SYSTEMS");
 

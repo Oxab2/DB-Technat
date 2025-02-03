@@ -1,11 +1,11 @@
 
 // Script repondant a la question "Qui sont l’ensemble des personnes travaillant sur le projet  “non du da “"
-
 require('dotenv').config();
+
 const { MongoClient } = require("mongodb");
 
 // Info connexion
-const uri = process.env.DB_URI;
+const uri = "mongodb://ia-oxab:m8QmKHpKAwMJQuU47TYG@192.168.1.29:27017/?authSource=da";
 const client = new MongoClient(uri);
 
 async function getCollection(nameCollection) {
@@ -13,7 +13,7 @@ async function getCollection(nameCollection) {
         await client.connect();  
         console.log("Connecter ");
 
-        const db = client.db(process.env.DB_NAME)
+        const db = client.db("da");  // da et da-re7
         const collection = db.collection(nameCollection);  
 
         const documents = await collection.find().toArray();  

@@ -4,7 +4,7 @@ require('dotenv').config();
 const { MongoClient } = require("mongodb");
 
 // Info connexion
-const uri = process.env.DB_URI;
+const uri = "mongodb://ia-oxab:m8QmKHpKAwMJQuU47TYG@192.168.1.29:27017/?authSource=da";
 const client = new MongoClient(uri);
 
 const metiers = [
@@ -25,7 +25,7 @@ async function getCollection(search) {
         await client.connect();  
         console.log("Connecter ");
 
-        const db = client.db(process.env.DB_NAME)
+        const db = client.db("da");  // da et da-re7
         const collection = db.collection("dossier_affaires");  
 
         const projection = {};
