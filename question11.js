@@ -1,5 +1,4 @@
-// Script repondant a la question "Qui est la chargée formulation  sur le DAXXXX "
-
+// Script repondant a la question "Combien de formules ont été réalisée sur le projet"
 
 const { MongoClient } = require("mongodb");
 
@@ -7,7 +6,7 @@ const { MongoClient } = require("mongodb");
 const uri = "mongodb://ia-oxab:m8QmKHpKAwMJQuU47TYG@192.168.1.29:27017/?authSource=da";
 const client = new MongoClient(uri);
 
-async function getLastCommentByDA(search) {
+async function getNbFormuleByDA(search) {
     try {
         await client.connect();
         console.log("Connecté");
@@ -47,20 +46,6 @@ async function getLastCommentByDA(search) {
                     path: "$essai",
                     preserveNullAndEmptyArrays: true 
                 }
-            },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "essai.chargeFormulationId", 
-                    foreignField: "_id",
-                    as: "chargeFormulation"
-                }
-            },
-            {
-                $unwind: {
-                    path: "$chargeFormulation",
-                    preserveNullAndEmptyArrays: true
-                }
             }
         ]).toArray();
 
@@ -70,10 +55,10 @@ async function getLastCommentByDA(search) {
         }
 
         documents.forEach(doc => {
-            if (doc.chargeFormulation) {
-                console.log(`Le chargé de formulation pour l'affaire ${search} est : ${doc.chargeFormulation.nom} ${doc.chargeFormulation.prenom}`);
+            if (doc.essai) {
+                console.log(`il y a eu ${doc.essai.numero} formule pour l'affaire ${search} `);
             } else {
-                console.log(`Aucun chargé de formulation trouvé pour l'affaire ${search}.`);
+                console.log(`Aucun essai trouvé pour l'affaire ${search}.`);
             }
         });
 
@@ -87,4 +72,4 @@ async function getLastCommentByDA(search) {
     }
 }
 
-getLastCommentByDA("1C0244A - CREME RICHE DEFI ANTI-AGE (GAMME ANTI AGE)");
+getNbFormuleByDA("1C0244A - CREME RICHE DEFI ANTI-AGE (GAMME ANTI AGE)");

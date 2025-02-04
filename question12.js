@@ -1,4 +1,4 @@
-// Script repondant a la question "Qui est la chargée formulation  sur le DAXXXX "
+// Script repondant a la question "Quel est la différence entre les 2 dernières formules d’un même DA"
 
 
 const { MongoClient } = require("mongodb");
@@ -7,7 +7,7 @@ const { MongoClient } = require("mongodb");
 const uri = "mongodb://ia-oxab:m8QmKHpKAwMJQuU47TYG@192.168.1.29:27017/?authSource=da";
 const client = new MongoClient(uri);
 
-async function getLastCommentByDA(search) {
+async function getFormule(search) {
     try {
         await client.connect();
         console.log("Connecté");
@@ -47,20 +47,6 @@ async function getLastCommentByDA(search) {
                     path: "$essai",
                     preserveNullAndEmptyArrays: true 
                 }
-            },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "essai.chargeFormulationId", 
-                    foreignField: "_id",
-                    as: "chargeFormulation"
-                }
-            },
-            {
-                $unwind: {
-                    path: "$chargeFormulation",
-                    preserveNullAndEmptyArrays: true
-                }
             }
         ]).toArray();
 
@@ -70,13 +56,15 @@ async function getLastCommentByDA(search) {
         }
 
         documents.forEach(doc => {
-            if (doc.chargeFormulation) {
-                console.log(`Le chargé de formulation pour l'affaire ${search} est : ${doc.chargeFormulation.nom} ${doc.chargeFormulation.prenom}`);
+            if (doc.essai && doc.essai.matierePremieres) {
+                console.log("\nFormule pour:", search);
+                doc.essai.matierePremieres.forEach(matierePremiere => {
+                    console.log(` ${matierePremiere.nomCommercial}`);
+                });
             } else {
-                console.log(`Aucun chargé de formulation trouvé pour l'affaire ${search}.`);
+                console.log("Aucune matière première trouvée.");
             }
         });
-
         // console.log(JSON.stringify(documents, null, 2));
 
     } catch (error) {
@@ -87,4 +75,6 @@ async function getLastCommentByDA(search) {
     }
 }
 
-getLastCommentByDA("1C0244A - CREME RICHE DEFI ANTI-AGE (GAMME ANTI AGE)");
+getFormule("1C0244A - CREME RICHE DEFI ANTI-AGE (GAMME ANTI AGE)");
+
+
